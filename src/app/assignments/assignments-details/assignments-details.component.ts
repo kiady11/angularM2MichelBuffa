@@ -10,9 +10,6 @@ import { AssignmentsService } from 'src/app/shared/assignments.service';
 export class AssignmentsDetailsComponent {
   @Input()
   assignmentTransmis?:Assignment;
-  @Output()
-  deleteAssignment = new EventEmitter();
-
 
   constructor(private assignmentsService:AssignmentsService) { }
 
@@ -21,11 +18,14 @@ export class AssignmentsDetailsComponent {
 
     console.log("Suppression de l'assignment " + this.assignmentTransmis.nom);
 
-    // On émet l'événement deleteAssignment
-    this.deleteAssignment.emit();
+    // on demande au service la suppression de l'assignment
+    this.assignmentsService.deleteAssignment(this.assignmentTransmis)
+    .subscribe(message => {
+      console.log(message);
+       // Pour cacher le detail, on met l'assignment à null
+      this.assignmentTransmis = undefined;
+    });
 
-    // Pour cacher le detail, on met l'assignment à null
-    this.assignmentTransmis = undefined;
   }
 
   onAssignmentRendu() {

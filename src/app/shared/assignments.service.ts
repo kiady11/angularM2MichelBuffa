@@ -1,32 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Assignment } from '../assignments/assignment.model';
 import { Observable, of } from 'rxjs';
+import { LoggingService } from './loggin.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AssignmentsService {
 
-   // tableau de devoirs à rendre
-   assignments:Assignment[] = [
-    {
-      nom: "Devoir Angular de Mr Buffa",
-      dateDeRendu: new Date("2023-06-01"),
-      rendu:false
-    },
-    {
-      nom: "Devoir Grails de Mr Galli",
-      dateDeRendu: new Date("2023-04-15"),
-      rendu:true
-    },
-    {
-      nom: "Devoir Big Data de Mr Mopolo",
-      dateDeRendu: new Date("2023-02-10"),
-      rendu:true
-    }
-  ]
-
-  constructor() { }
+// tableau de devoirs à rendre
+assignments:Assignment[] = [
+  {
+    nom: "Devoir Angular de Mr Buffa",
+    dateDeRendu: new Date("2023-06-01"),
+    rendu:false
+  },
+  {
+    nom: "Devoir Grails de Mr Galli",
+    dateDeRendu: new Date("2023-04-15"),
+    rendu:true
+  },
+  {
+    nom: "Devoir Big Data de Mr Mopolo",
+    dateDeRendu: new Date("2023-02-10"),
+    rendu:true
+  }
+]
+  constructor(private loggingService:LoggingService) { }
 
   getAssignments():Observable<Assignment[]> {
     // normalement on doit envoyer une requête HTTP
@@ -46,6 +46,7 @@ export class AssignmentsService {
     this.assignments.push(assignment);
     // on retourne un message de succès à travers
     // un Observable
+    this.loggingService.log(assignment.nom, 'ajouté');
     return of(`Assignment ${assignment.nom} ajouté avec succès`);
   }
 
@@ -56,6 +57,20 @@ export class AssignmentsService {
     // dans la version tableau : rien à faire (pourquoi ? Parceque assignment
     // est déjà un élément du tableau this.assignments)
 
+    this.loggingService.log(assignment.nom, 'modifié');
+
     return of(`Assignment ${assignment.nom} modifié avec succès`)
+  }
+
+  deleteAssignment(assignment:Assignment):Observable<string> {
+      // pour supprimer on passe à la méthode splice
+    // l'index de l'assignment à supprimer et
+    // le nombre d'éléments à supprimer (ici 1)
+    const index = this.assignments.indexOf(assignment);
+    this.assignments.splice(index, 1);
+
+    this.loggingService.log(assignment.nom, 'supprimé');
+
+    return of('Assignment supprimé avec succès')
   }
 }

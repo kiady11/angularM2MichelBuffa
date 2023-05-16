@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Assignment } from '../assignment.model';
+import { AssignmentsService } from 'src/app/shared/assignments.service';
 
 @Component({
   selector: 'app-add-assignment',
@@ -7,27 +8,34 @@ import { Assignment } from '../assignment.model';
   styleUrls: ['./add-assignment.component.css']
 })
 export class AddAssignmentComponent {
- // champs du formulaire
- nomDevoir = "";
- dateDeRendu!: Date;
- @Output()
- nouvelAssignment = new EventEmitter<Assignment>();
+  @Output()
+  assignmentAdded = new EventEmitter();
 
- onSubmit(event: any) {
-   // On vérifie que les champs ne sont pas vides
-   if (this.nomDevoir === "") return;
-   if (this.dateDeRendu === undefined) return;
+  // champs du formulaire
+  nomDevoir = "";
+  dateDeRendu!: Date;
 
-   let nouvelAssignment = new Assignment();
-   nouvelAssignment.nom = this.nomDevoir;
-   nouvelAssignment.dateDeRendu = this.dateDeRendu;
-   nouvelAssignment.rendu = false;
+  constructor(private assignmentsService: AssignmentsService) { }
 
-   //this.assignments.push(nouvelAssignment);
-   // On envoie l'assignment qu'on vient de créer
-   // attaché à un événement de nom "nouvelAssignment"
-   // Remarque : ici, dans ce composant, le même nom
-   // est aussi l'emmeteur de l'événement
-   this.nouvelAssignment.emit(nouvelAssignment);
- }
+  onSubmit(event: any) {
+    // On vérifie que les champs ne sont pas vides
+    if (this.nomDevoir === "") return;
+    if (this.dateDeRendu === undefined) return;
+
+    let nouvelAssignment = new Assignment();
+    nouvelAssignment.nom = this.nomDevoir;
+    nouvelAssignment.dateDeRendu = this.dateDeRendu;
+    nouvelAssignment.rendu = false;
+
+    // on demande au service d'ajouter l'assignment
+    this.assignmentsService.addAssignment(nouvelAssignment)
+      .subscribe(message => {
+        console.log(message);
+
+        // on emet un event pour afficher la liste et
+        // cacher le formulaire
+        this.assignmentAdded.emit();
+
+      });
+  }
 }
